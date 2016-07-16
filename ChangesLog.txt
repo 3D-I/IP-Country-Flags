@@ -18,7 +18,7 @@ Changes Log of IPCF 31-32
 * TASK: template switch over all
 * TASK: code improvement (the only one SQL query has been re-added)
 * FIX: wrong Flags on index, online list and viewtopic
-* NEW: screenshots
+* NEW: new screenshots
 * WIP: Avatars stuff
 * WIP: cacheing where is possible
 
