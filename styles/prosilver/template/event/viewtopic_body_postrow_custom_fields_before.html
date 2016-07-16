@@ -1,1 +1,5 @@
-<!-- IF postrow.S_ONLINE and not postrow.S_POST_HIDDEN --><dd><strong>{L_COUNTRY}</strong> {postrow.COUNTRY_FLAG}</dd><!-- ENDIF -->
+<!-- IF postrow.S_ONLINE and not postrow.S_POST_HIDDEN and S_IPCF -->
+	<dd>
+		<strong>{L_COUNTRY}</strong> {postrow.COUNTRY_FLAG}
+	</dd>
+<!-- ENDIF -->

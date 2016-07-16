@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "A kind of Country Flags invasion for your phpBB",
 	"homepage": "http://3di.space/32/",
-	"version": "1.0.0.0002",
+	"version": "1.0.0.0003",
 	"license": "GPL-2.0",
 	"authors": [
 		{

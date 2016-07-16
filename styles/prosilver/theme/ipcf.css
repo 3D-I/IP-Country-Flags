@@ -12,4 +12,6 @@
 
 .flag_image_avatar {
 	margin-left: 8px;
+	max-width: 100px;
+	height: auto;
 }

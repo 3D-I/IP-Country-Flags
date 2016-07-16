@@ -48,6 +48,29 @@ class ipcf_functions
 	}
 
 	/**
+	 * Obtain suser_session_flag
+	 *
+	 * @return string user_session_flag
+	 */
+	public function user_session_flag($user_id)
+	{
+		$sql = 'SELECT DISTINCT session_ip
+			FROM ' . SESSIONS_TABLE . '
+				WHERE session_user_id = ' . $user_id . '
+					AND ' . $user_id . ' > ' . ANONYMOUS . '';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+
+		$user_session_ip = $row['session_ip'];
+
+		$user_session_flag = $this->obtain_country_flag_string($user_session_ip);
+
+		$this->db->sql_freeresult($result);
+
+		return $user_session_flag;
+	}
+
+	/**
 	 * Returns whether cURL is available
 	 *
 	 * @return bool
@@ -56,6 +79,9 @@ class ipcf_functions
 	{
 		return function_exists('curl_version');
 	}
+
+// TODO: handling the future implementation of Flag Normal and Flag Avatar
+// Flag Small is right for topics and posts and so on..
 
 	/**
 	 * Returns the IP to Country Flag small string from the ISO Country Code
@@ -93,21 +119,6 @@ class ipcf_functions
 		return $country_flag;
 	}
 
-// TODO: handling the future implementation of Flag Normal and Flag Avatar
-// Flag Small is right for topics and posts and so on..
-
-// TODO: obtain an array of avatars to compare with the response result
-// because (avatars are less than the usual flags)
-/*
-	$avatars_array = array();
-
-	if ($ip_array['status'] == 'success' && !in_array($ip_array['countryCode'], $avatars_array))
-	{
-		// IP not in available as Avatar
-		$flag = missing avatar image for country flag response
-	}
-*/
-
 	/**
 	 * Obtain Country Flag string from cURL
 	 *
@@ -134,8 +145,8 @@ class ipcf_functions
 
 			if ($ip_array['status'] == 'success')
 			{
-				$iso_country_code =  strtolower($ip_array['countryCode']);
-				$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+				$iso_country_code	=	strtolower($ip_array['countryCode']);
+				$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
 			/**
 			 * Unknown or reserved IPS here
@@ -145,9 +156,9 @@ class ipcf_functions
 				/**
 				 * WO represents my flag of World, aka Unknown IP
 				*/
-				$failure =  ipcf_constants::FLAG_WORLD;
-				$iso_country_code =  strtolower($failure);
-				$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+				$failure			=	ipcf_constants::FLAG_WORLD;
+				$iso_country_code	=	strtolower($failure);
+				$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
 		}
 		else
@@ -156,9 +167,9 @@ class ipcf_functions
 			 * Server's outage, doing the dirty job here
 			 * WO represents my flag of World, aka Unknown IP
 			*/
-			$failure = ipcf_constants::FLAG_WORLD;
-			$iso_country_code =  strtolower($failure);
-			$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+			$failure			=	ipcf_constants::FLAG_WORLD;
+			$iso_country_code	=	strtolower($failure);
+			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 		}
 
 		return ($country_flag);
@@ -178,8 +189,8 @@ class ipcf_functions
 
 		if (($json_response->status) == 'success')
 		{
-			$iso_country_code =  strtolower($json_response->countryCode);
-			$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+			$iso_country_code	=	strtolower($json_response->countryCode);
+			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 		}
 		/**
 		 * Unknown or reserved IPS here
@@ -189,9 +200,9 @@ class ipcf_functions
 			/**
 			 * WO represents my flag of World, aka Unknown IP
 			*/
-			$failure = ipcf_constants::FLAG_WORLD;
-			$iso_country_code =  strtolower($failure);
-			$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+			$failure			=	ipcf_constants::FLAG_WORLD;
+			$iso_country_code	=	strtolower($failure);
+			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 		}
 		else
 		{
@@ -199,9 +210,9 @@ class ipcf_functions
 			 * Server's outage, doing the dirty job here
 			 * WO represents my flag of World, aka Unknown IP
 			*/
-			$failure = ipcf_constants::FLAG_WORLD;
-			$iso_country_code =  strtolower($failure);
-			$country_flag = $this->iso_to_flag_string_small($iso_country_code);
+			$failure			=	ipcf_constants::FLAG_WORLD;
+			$iso_country_code	=	strtolower($failure);
+			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 		}
 
 		return ($country_flag);
