@@ -11,17 +11,17 @@ See also https://en.wikipedia.org/wiki/ISO_3166-2 for the Country Codes values
 
 Online list on index screenshot
 
-![Screenshot](v0002-online_list.png)
+![Screenshot](grabs/v0003-onlinelist.png)
 
 Viewtopic online list screenshot
 
-![Screenshot](v0002-viewtopic_online_list.png)
+![Screenshot](grabs/v0003-viewtopic-onlinelist.png)
 
 Viewtopic's mini-profile screenshot, once Users are logged in
 
-![Screenshot](v0002-viewtopic-in.png)
+![Screenshot](grabs/v0003-viewtopic-in.png)
 
 Viewtopic's mini-profile screenshot, once Users are logged in and out
 
-![Screenshot](v0002-viewtopic-out.png)
+![Screenshot](grabs/v0003-viewtopic-out.png)
 
