@@ -172,7 +172,9 @@ class listener implements EventSubscriberInterface
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}
+
 			// note to self: avoid sizeof?
+
 			if (sizeof($username))
 			{
 				$online_userlist = str_replace($username, $username_ipcf, $online_userlist);
