@@ -70,6 +70,10 @@ class listener implements EventSubscriberInterface
 		$this->ipcf_functions	=	$ipcf_functions;
 	}
 
+	/* Config time for cache, hinerits from View online time span */
+	//$config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
+
+	// if empty($this->user->data['user_avatar']) // just a note to self ;)
 
 	static public function getSubscribedEvents()
 	{
@@ -78,6 +82,7 @@ class listener implements EventSubscriberInterface
 			'core.permissions'							=>	'permissions',
 			'core.page_header_after'					=>	'icpf_template_switch',
 			'core.viewtopic_modify_post_row'			=>	'viewtopic_flags',
+			'core.obtain_users_online_string_sql'		=>	'ipcf_obtain_users_online_string_sql_add',
 			'core.obtain_users_online_string_modify'	=>	'users_online_string_flags',
 		);
 	}
@@ -113,16 +118,12 @@ class listener implements EventSubscriberInterface
 		));
 	}
 
-	/* Config time for cache, hinerits from View online time span */
-	//$config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
-
 	public function viewtopic_flags($event)
 	{
 		/* Check permission before to run the code */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$user_id = $event['post_row']['POSTER_ID'];
-
 			/**
 			 * The Flag Image itself lies here
 			*/
@@ -133,26 +134,51 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
+	/* We need the availability of the user's session IP into the next event's rowset */
+	public function ipcf_obtain_users_online_string_sql_add($event)
+	{
+		/* Check permission before to run the code */
+		if ($this->auth->acl_get('u_allow_ipcf'))
+		{
+			$sql_ary = $event['sql_ary'];
+
+			$sql_ary['SELECT'] .= ', s.session_user_id, s.session_ip';
+
+			$sql_ary['LEFT_JOIN'][] = array(
+				'FROM'	=> array(
+					SESSIONS_TABLE => 's',
+				),
+				'ON'	=> 's.session_user_id = u.user_id',
+			);
+
+			$event['sql_ary'] = $sql_ary;
+		}
+	}
+
+	/* Now we can play with it, the users's session IP saves our day */
 	public function users_online_string_flags($event)
 	{
 		/* Check permission before to run the code */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$rowset = $event['rowset'];
-			$user_online_link = $event['user_online_link'];
 			$online_userlist = $event['online_userlist'];
 
-			$flag = array();
+			$username = $username_ipcf = array();
 
-			foreach ($rowset as $key => $value)
+			foreach ($rowset as $row)
 			{
-				$flag[$value['user_id']] = $this->ipcf_functions->user_session_flag( (int) $value['user_id']);
+				$user_id_flag = $this->ipcf_functions->obtain_country_flag_string($row['session_ip']);
+				$username[] = $row['username'];
+				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}
-			foreach ($user_online_link as $key => $value)
+
+			// note to self: avoid sizeof?
+			if (sizeof($username))
 			{
-				$user_online_link[$key] = $flag[$key] . ' ' . $user_online_link[$key];
+				$online_userlist = str_replace($username, $username_ipcf, $online_userlist);
 			}
-			$event['online_userlist'] = $this->user->lang['REGISTERED_USERS'] . ' ' . implode(', ', $user_online_link);
+			$event['online_userlist'] = $online_userlist;
 		}
 	}
 }
