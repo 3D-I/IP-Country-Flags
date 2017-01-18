@@ -114,7 +114,8 @@ class listener implements EventSubscriberInterface
 	public function icpf_template_switch($event)
 	{
 		$this->template->assign_vars(array(
-			'S_IPCF'	=>	($this->auth->acl_get('u_allow_ipcf')) ? true : false,
+			'S_IPCF'			=>	($this->auth->acl_get('u_allow_ipcf')) ? true : false,
+			'IPCF_CREDIT_LINE'	=>	$this->user->lang('POWERED_BY_IPCF', '<a href="http://3di.space/32/">IP Country Flag</a> &copy; 3Di'), // Don't remove this line please.
 		));
 	}
 

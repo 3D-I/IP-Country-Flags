@@ -38,7 +38,8 @@ if (empty($lang) || !is_array($lang))
 */
 
 $lang = array_merge($lang, array(
-	'COUNTRY'	=> 'IP from: ',
+	'COUNTRY'			=> 'IP from: ',
+	'POWERED_BY_IPCF'	=>	' && %s',
 
 	'country' => array(
 		'AX'	=> 'Åland Islands',

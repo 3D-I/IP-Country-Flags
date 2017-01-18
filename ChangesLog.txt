@@ -26,11 +26,13 @@ Changes Log of IPCF 31-32
 - v1.0.0-b1
 ---------------------------------------------------------------------
 * TASK: code housekeeping
-* NEW: using bigger flag images (18x12)
+* NEW: requirements: phpBB min. 3.1.10 OR min. 3.2.0 AND cURL
+* NEW: using bigger flag images (18x12) (PNG 24bit)
 * NEW: CSS improvement
 * NEW: cURL is mandatory
 * NEW: new IP lookup service
 * NEW: new language file
 * NEW: new ext.php with mandatory requisites check
+* NEW: added Copyright on footer
 * WIP: Avatars stuff
 * WIP: cacheing where is possible
