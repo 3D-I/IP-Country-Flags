@@ -30,7 +30,7 @@ class ext extends \phpbb\extension\base
 		/**
 		 * We rely on constants.php
 		 */
-		if ( ($bb320) || ($bb3110) )
+		if ( ( ($bb320) || ($bb3110) ) && (function_exists('curl_version')) )
 		{
 			return true;
 		}

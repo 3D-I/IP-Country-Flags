@@ -34,5 +34,5 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'EXTENSION_REQUIREMENTS_NOTICE'	=>	'Your phpBB installation doesn\'t meet the requirements of <b>IP Country Flag</b> extension.<br>You need at least phpBB 3.1.10 or phpBB 3.2.0.',
+	'EXTENSION_REQUIREMENTS_NOTICE'	=>	'Your phpBB installation doesn\'t meet the requirements of <strong>IP Country Flag</strong> extension.<br />You need at least phpBB 3.1.10 or phpBB 3.2.0.<br />The presence of cURL is mandatory as well.',
 ));
