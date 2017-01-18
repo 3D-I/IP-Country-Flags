@@ -129,31 +129,32 @@ class ipcf_functions
 		/* Some code borrowed from david63's Cookie Policy ext */
 		$curl_handle = curl_init();
 		curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
-		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
-		/**
-		 * 16386 = countryCode,status fields, using magic numbers to save bandwidth
-		*/
-		curl_setopt($curl_handle, CURLOPT_URL, 'http://ip-api.com/json/' . $user_session_ip . '?fields=16386');
+		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl_handle, CURLOPT_URL, 'freegeoip.net/json/' . $user_session_ip);
 
+		/* return (string) or false (bool) */
 		$ip_query = curl_exec($curl_handle);
+
+		$http_code	= curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
 		curl_close($curl_handle);
 
-		if (!empty($ip_query))
+		if ($ip_query)
 		{
 			/* Creating an array from string*/
 			$ip_array = @json_decode($ip_query, true);
 
-			if ($ip_array['status'] == 'success')
+			if ( ($ip_array['country_code'] != '') && ($http_code == 200) )
 			{
-				$iso_country_code	=	strtolower($ip_array['countryCode']);
+				$iso_country_code	=	strtolower($ip_array['country_code']);
 				$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
 			/**
 			 * Unknown or reserved IPS here
 			*/
-			else if ($ip_array['status'] != 'success')
+			else
 			{
 				/**
+				 * error 403 forbidden (too many requests) or any other thing
 				 * WO represents my flag of World, aka Unknown IP
 				*/
 				$failure			=	ipcf_constants::FLAG_WORLD;
@@ -164,7 +165,7 @@ class ipcf_functions
 		else
 		{
 			/**
-			 * Server's outage, doing the dirty job here
+			 * http_code = 0, doing the dirty job here
 			 * WO represents my flag of World, aka Unknown IP
 			*/
 			$failure			=	ipcf_constants::FLAG_WORLD;
@@ -185,9 +186,9 @@ class ipcf_functions
 		/**
 		 * 16386 = countryCode,status fields, using magic numbers to save bandwidth
 		*/
-		$json_response = @json_decode(file_get_contents('http://ip-api.com/json/' . $user_session_ip . '?fields=16386'));
+		$json_response = @json_decode(file_get_contents('freegeoip.net/json/' . $user_session_ip));
 
-		if (($json_response->status) == 'success')
+		if (($json_response->country_code) != '')
 		{
 			$iso_country_code	=	strtolower($json_response->countryCode);
 			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
@@ -240,7 +241,8 @@ class ipcf_functions
 		*/
 		else
 		{
-			$country_flag = ( $this->obtain_country_flag_string_fcg($user_session_ip) );
+			$country_flag = 'wo';
+			//$country_flag = ( $this->obtain_country_flag_string_fcg($user_session_ip) );
 		}
 
 		return ($country_flag);
