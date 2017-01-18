@@ -36,3 +36,7 @@ Changes Log of IPCF 31-32
 * NEW: added Copyright on footer
 * WIP: Avatars stuff
 * WIP: cacheing where is possible
+*
+* CREDITS:
+* - Avatars created by marcus.smith (phpBb dot com validated pack)
+* - Flags are Royalty Free (Public Domain) by http://ip-to-country.webhosting.info/ (2008)
