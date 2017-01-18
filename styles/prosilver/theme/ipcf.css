@@ -1,17 +1,21 @@
 .flag_image_small {
-	width: 14px;
-	height: 9px;
-	vertical-align: middle;
+	width: auto;
+	max-width: 14px;
+	max-height: 9px;
+	vertical-align: text-bottom;
 }
 
 .flag_image_normal {
-	width: 18px;
-	height: 12px;
-	vertical-align: middle;
+	width: auto;
+	max-width: 18px;
+	max-height: 12px;
+	vertical-align: text-bottom;
 }
 
 .flag_image_avatar {
 	margin-left: 8px;
+	width: auto;
 	max-width: 80px;
-	height: auto;
+	max-height: auto;
+	vertical-align: middle;
 }

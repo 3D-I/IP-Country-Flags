@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - IPCF 1.0.0 -(IP Country Flag)
-* @copyright (c) 2005 - 2008 - 2016 3Di (Marco T.)
+* @copyright (c) 2005, 2008 , 2017 - 3Di http://3di.space/32/
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -174,7 +174,6 @@ class listener implements EventSubscriberInterface
 			}
 
 			// note to self: avoid sizeof?
-
 			if (sizeof($username))
 			{
 				$online_userlist = str_replace($username, $username_ipcf, $online_userlist);

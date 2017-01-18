@@ -4,7 +4,7 @@
 * IPCF 1.0.0 [English]
 *
 * @package phpBB Extension - IPCF 1.0.0 -(IP Country Flag)
-* @copyright (c) 2005 - 2008 - 2016 3Di (Marco T.)
+* @copyright (c) 2005, 2008 , 2017 - 3Di http://3di.space/32/
 * @license GNU General Public License, version 2 (GPL-2.0)
 *
 */
@@ -285,6 +285,7 @@ $lang = array_merge($lang, array(
 		'YE'	=> 'Yemen',
 		'ZM'	=> 'Zambia',
 		'ZW'	=> 'Zimbabwe',
+		// extra codes by 3Di
 		'WO'	=> 'unknown IP',
 		'LH'	=> 'Localhost, your PC.',
 		'GUEST'	=> 'Guest',

@@ -3,7 +3,7 @@
  *
  * IPCF [English]. An extension for the phpBB Forum Software package.
  *
- * @copyright (c) 2005 - 2008 - 2016 - 3Di - http://3di.space/32/
+ * @copyright (c) 2005, 2008, 2017 - 3Di http://3di.space/32/
  * @license GNU General Public License, version 2 (GPL-2.0)
  *
  */
