@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "A kind of Country Flags invasion for your phpBB",
 	"homepage": "http://3di.space/32/",
-	"version": "1.0.0.0003",
+	"version": "1.0.0-b1",
 	"license": "GPL-2.0",
 	"authors": [
 		{
@@ -14,12 +14,12 @@
 	],
 	"require": {
 		"php": ">=5.3.3",
-		"phpbb/phpbb": ">=3.1.9,<3.3.0@dev"
+		"phpbb/phpbb": ">=3.1.10,<3.3.0@dev"
 	},
 	"extra": {
 		"display-name": "IP Country Flag",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.1.9,<3.3.0@dev"
+			"phpbb/phpbb": ">=3.1.10,<3.3.0@dev"
 		},
 		"version-check":
 		{
