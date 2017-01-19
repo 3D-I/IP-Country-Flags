@@ -60,11 +60,8 @@ class ipcf_functions
 					AND ' . $user_id . ' > ' . ANONYMOUS . '';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
-
 		$user_session_ip = $row['session_ip'];
-
 		$user_session_flag = $this->obtain_country_flag_string($user_session_ip);
-
 		$this->db->sql_freeresult($result);
 
 		return $user_session_flag;
@@ -198,7 +195,8 @@ class ipcf_functions
 		*/
 		else
 		{
-			$country_flag = 'wo';
+			$failure		=	ipcf_constants::FLAG_WORLD;
+			$country_flag	=	strtolower($failure);
 		}
 
 		return ($country_flag);
