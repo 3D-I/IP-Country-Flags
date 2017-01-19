@@ -54,10 +54,13 @@ class ipcf_functions
 	 */
 	public function user_session_flag($user_id)
 	{
-		$sql = 'SELECT DISTINCT session_ip
-			FROM ' . SESSIONS_TABLE . '
-				WHERE session_user_id = ' . $user_id . '
-					AND ' . $user_id . ' > ' . ANONYMOUS . '';
+		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_ip, s.session_user_id, u.user_lastvisit
+			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
+				WHERE s.session_user_id = ' . $user_id . '
+					AND ' . $user_id . ' > ' . ANONYMOUS . '
+					AND s.session_last_visit = u.user_lastvisit
+				GROUP BY s.session_ip
+				ORDER BY s.session_user_id DESC';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$user_session_ip = $row['session_ip'];
