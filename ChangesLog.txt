@@ -1,26 +1,18 @@
 Changes Log of IPCF 31-32
 
 ---------------------------------------------------------------------
-- v1.0.0-dev-v0002
+- v1.0.0-b2
 ---------------------------------------------------------------------
-* FEATURE: users online Flags
-* TASK: code improvement (the only one SQL query has been removed)
-* TASK: use of cURL where is possible
-* TASK: use of constants
-* new functions added
-* a working version checker
-* avatars Flags' folder moved to the final destination
-* style moved to prosilver only
-
----------------------------------------------------------------------
-- v1.0.0-dev-v0003
----------------------------------------------------------------------
-* TASK: template switch over all
-* TASK: code improvement (the only one SQL query has been re-added)
-* FIX: wrong Flags on index, online list and viewtopic
-* NEW: new screenshots
-* WIP: Avatars stuff
-* WIP: cacheing where is possible
+* TASK: using TWIG syntax where applicable
+* FIX: Multiflags on a per user basis - Issue #3
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
 
 ---------------------------------------------------------------------
 - v1.0.0-b1
@@ -35,8 +27,30 @@ Changes Log of IPCF 31-32
 * NEW: new ext.php with mandatory requisites check
 * NEW: added Copyright on footer
 * WIP: Avatars stuff
-* WIP: cacheing where is possible
+* WIP: caching where is possible
 *
 * CREDITS:
 * - Avatars created by marcus.smith (phpBb dot com validated pack)
 * - Flags are Royalty Free (Public Domain) by http://ip-to-country.webhosting.info/ (2008)
+
+---------------------------------------------------------------------
+- v1.0.0-dev-v0003
+---------------------------------------------------------------------
+* TASK: template switch over all
+* TASK: code improvement (the only one SQL query has been re-added)
+* FIX: wrong Flags on index, online list and viewtopic
+* NEW: new screenshots
+* WIP: Avatars stuff
+* WIP: cacheing where is possible
+
+---------------------------------------------------------------------
+- v1.0.0-dev-v0002
+---------------------------------------------------------------------
+* FEATURE: users online Flags
+* TASK: code improvement (the only one SQL query has been removed)
+* TASK: use of cURL where is possible
+* TASK: use of constants
+* new functions added
+* a working version checker
+* avatars Flags' folder moved to the final destination
+* style moved to prosilver only

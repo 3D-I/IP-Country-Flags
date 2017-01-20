@@ -52,6 +52,7 @@ class ipcf_functions
 	 *
 	 * @return string user_session_flag
 	 */
+	// s.session_time < now()
 	public function user_session_flag($user_id)
 	{
 		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_ip, s.session_user_id, u.user_lastvisit
@@ -105,7 +106,7 @@ class ipcf_functions
 	}
 
 	/**
-	 * Returns the IP to Country Flag for Avatars string from the ISO Country Code
+	 * Returns the IP to Country Flag for avatars string from the ISO Country Code
 	 *
 	 * @return string
 	 */
@@ -146,9 +147,6 @@ class ipcf_functions
 				$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
 				//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
-			/**
-			 * Unknown or reserved IPS here
-			*/
 			else
 			{
 				/**
@@ -184,7 +182,6 @@ class ipcf_functions
 	public function obtain_country_flag_string($user_session_ip)
 	{
 		/**
-		 * The Flag Image itself lies here
 		 * First we check if cURL is available here
 		*/
 		$is_curl = $this->is_curl();
