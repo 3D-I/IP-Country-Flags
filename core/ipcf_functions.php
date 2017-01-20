@@ -50,12 +50,15 @@ class ipcf_functions
 	/**
 	 * Obtain suser_session_flag
 	 *
-	 * @return string user_session_flag
+	 * @return string user_session_flag for viewtopic
 	 */
-	// s.session_time < now()
+
+	// $now_time = (time() -1);
+	// s.session_time < (int) $now_time()
+
 	public function user_session_flag($user_id)
 	{
-		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_ip, s.session_user_id, u.user_lastvisit
+		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_user_id, s.session_ip, u.user_lastvisit
 			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
 				WHERE s.session_user_id = ' . $user_id . '
 					AND ' . $user_id . ' > ' . ANONYMOUS . '
