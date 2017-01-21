@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - IPCF 1.0.0 -(IP Country Flag)
-* @copyright (c) 2005 - 2008 - 2016 3Di (Marco T.)
+* @copyright (c) 2005, 2008 , 2017 - 3Di http://3di.space/32/
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -50,21 +50,26 @@ class ipcf_functions
 	/**
 	 * Obtain suser_session_flag
 	 *
-	 * @return string user_session_flag
+	 * @return string user_session_flag for viewtopic
 	 */
+
+	// $now_time = (time() -1);
+	// s.session_time < (int) $now_time()
+
 	public function user_session_flag($user_id)
 	{
-		$sql = 'SELECT DISTINCT session_ip
-			FROM ' . SESSIONS_TABLE . '
-				WHERE session_user_id = ' . $user_id . '
-					AND ' . $user_id . ' > ' . ANONYMOUS . '';
+		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_user_id, s.session_ip, u.user_lastvisit
+			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
+				WHERE s.session_user_id = ' . $user_id . '
+					AND ' . $user_id . ' > ' . ANONYMOUS . '
+					AND s.session_last_visit = u.user_lastvisit
+					AND s.session_ip = s.session_ip
+				GROUP BY s.session_user_id
+				ORDER BY s.session_start DESC';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
-
 		$user_session_ip = $row['session_ip'];
-
 		$user_session_flag = $this->obtain_country_flag_string($user_session_ip);
-
 		$this->db->sql_freeresult($result);
 
 		return $user_session_flag;
@@ -79,9 +84,6 @@ class ipcf_functions
 	{
 		return function_exists('curl_version');
 	}
-
-// TODO: handling the future implementation of Flag Normal and Flag Avatar
-// Flag Small is right for topics and posts and so on..
 
 	/**
 	 * Returns the IP to Country Flag small string from the ISO Country Code
@@ -108,7 +110,7 @@ class ipcf_functions
 	}
 
 	/**
-	 * Returns the IP to Country Flag for Avatars string from the ISO Country Code
+	 * Returns the IP to Country Flag for avatars string from the ISO Country Code
 	 *
 	 * @return string
 	 */
@@ -146,11 +148,9 @@ class ipcf_functions
 			if ( ($ip_array['country_code'] != '') && ($http_code == 200) )
 			{
 				$iso_country_code	=	strtolower($ip_array['country_code']);
-				$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
+				$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
+				//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
-			/**
-			 * Unknown or reserved IPS here
-			*/
 			else
 			{
 				/**
@@ -159,7 +159,8 @@ class ipcf_functions
 				*/
 				$failure			=	ipcf_constants::FLAG_WORLD;
 				$iso_country_code	=	strtolower($failure);
-				$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
+				$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
+				//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 			}
 		}
 		else
@@ -170,50 +171,8 @@ class ipcf_functions
 			*/
 			$failure			=	ipcf_constants::FLAG_WORLD;
 			$iso_country_code	=	strtolower($failure);
-			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-		}
-
-		return ($country_flag);
-	}
-
-	/**
-	 * Obtain Country Flag string from file_get_contents
-	 *
-	 * @return string country_flag
-	 */
-	public function obtain_country_flag_string_fcg($user_session_ip)
-	{
-		/**
-		 * 16386 = countryCode,status fields, using magic numbers to save bandwidth
-		*/
-		$json_response = @json_decode(file_get_contents('freegeoip.net/json/' . $user_session_ip));
-
-		if (($json_response->country_code) != '')
-		{
-			$iso_country_code	=	strtolower($json_response->countryCode);
-			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-		}
-		/**
-		 * Unknown or reserved IPS here
-		*/
-		else if (($json_response->status) == 'fail')
-		{
-			/**
-			 * WO represents my flag of World, aka Unknown IP
-			*/
-			$failure			=	ipcf_constants::FLAG_WORLD;
-			$iso_country_code	=	strtolower($failure);
-			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-		}
-		else
-		{
-			/**
-			 * Server's outage, doing the dirty job here
-			 * WO represents my flag of World, aka Unknown IP
-			*/
-			$failure			=	ipcf_constants::FLAG_WORLD;
-			$iso_country_code	=	strtolower($failure);
-			$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
+			$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
+			//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
 		}
 
 		return ($country_flag);
@@ -227,7 +186,6 @@ class ipcf_functions
 	public function obtain_country_flag_string($user_session_ip)
 	{
 		/**
-		 * The Flag Image itself lies here
 		 * First we check if cURL is available here
 		*/
 		$is_curl = $this->is_curl();
@@ -237,12 +195,12 @@ class ipcf_functions
 			$country_flag = ( $this->obtain_country_flag_string_curl($user_session_ip) );
 		}
 		/**
-		 * No cURL? Let's try another approach with file_get_contents
+		 * No cURL? That shouldn't happen but..
 		*/
 		else
 		{
-			$country_flag = 'wo';
-			//$country_flag = ( $this->obtain_country_flag_string_fcg($user_session_ip) );
+			$failure		=	ipcf_constants::FLAG_WORLD;
+			$country_flag	=	strtolower($failure);
 		}
 
 		return ($country_flag);
