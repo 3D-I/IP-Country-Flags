@@ -52,24 +52,19 @@ class ipcf_functions
 	 *
 	 * @return string user_session_flag for viewtopic
 	 */
-
-	// $now_time = (time() -1);
-	// s.session_time < (int) $now_time()
-
 	public function user_session_flag($user_id)
 	{
-		$sql = 'SELECT DISTINCT s.session_last_visit, s.session_user_id, s.session_ip, u.user_lastvisit
-			FROM ' . SESSIONS_TABLE . ' s, ' . USERS_TABLE . ' u
-				WHERE s.session_user_id = ' . $user_id . '
-					AND ' . $user_id . ' > ' . ANONYMOUS . '
-					AND s.session_last_visit = u.user_lastvisit
-					AND s.session_ip = s.session_ip
-				GROUP BY s.session_user_id
-				ORDER BY s.session_start DESC';
+		$sql = 'SELECT DISTINCT session_ip
+			FROM ' . SESSIONS_TABLE . '
+				WHERE session_user_id = ' . $user_id . '
+					AND ' . $user_id . ' > ' . ANONYMOUS . '';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
+
 		$user_session_ip = $row['session_ip'];
+
 		$user_session_flag = $this->obtain_country_flag_string($user_session_ip);
+
 		$this->db->sql_freeresult($result);
 
 		return $user_session_flag;
