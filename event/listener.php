@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - IPCF 1.0.0 -(IP Country Flag)
-* @copyright (c) 2005, 2008 , 2017 - 3Di http://3di.space/32/
+* @copyright (c) 2005 - 2008 - 2016 3Di (Marco T.)
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -72,6 +72,7 @@ class listener implements EventSubscriberInterface
 
 	/* Config time for cache, hinerits from View online time span */
 	//$config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
+
 	// if empty($this->user->data['user_avatar']) // just a note to self ;)
 
 	static public function getSubscribedEvents()
@@ -86,9 +87,6 @@ class listener implements EventSubscriberInterface
 		);
 	}
 
-	/**
-	 * Main language file inclusion
-	 */
 	public function load_language_on_setup($event)
 	{
 		$lang_set_ext = $event['lang_set_ext'];
@@ -99,9 +97,7 @@ class listener implements EventSubscriberInterface
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
 
-	/**
-	 * Permission's language file is automatically loaded
-	 */
+	/* Permission's language file is automatically loaded */
 	public function permissions($event)
 	{
 		$permissions = $event['permissions'];
@@ -114,22 +110,17 @@ class listener implements EventSubscriberInterface
 		$event['permissions'] = $permissions;
 	}
 
-	/**
-	* template switch over all
-	*/
+	/* template switch over all */
 	public function icpf_template_switch($event)
 	{
 		$this->template->assign_vars(array(
-			'S_IPCF'			=>	($this->auth->acl_get('u_allow_ipcf')) ? true : false,
-			'IPCF_CREDIT_LINE'	=>	$this->user->lang('POWERED_BY_IPCF', '<a href="http://3di.space/32/">IP Country Flag</a> &copy; 3Di'), // Don't remove this line please.
+			'S_IPCF'	=>	($this->auth->acl_get('u_allow_ipcf')) ? true : false,
 		));
 	}
 
 	public function viewtopic_flags($event)
 	{
-		/**
-		 * Check permission prior to run the code
-		 */
+		/* Check permission before to run the code */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$user_id = $event['post_row']['POSTER_ID'];
@@ -143,41 +134,31 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	/**
-	 * We need the availability of the user's session IP
-	 * for the event "users_online_string_flags", the next event's rowset
-	 */
+	/* We need the availability of the user's session IP into the next event's rowset */
 	public function ipcf_obtain_users_online_string_sql_add($event)
 	{
-		/**
-		 * Check permission prior to run the code
-		 */
+		/* Check permission before to run the code */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$sql_ary = $event['sql_ary'];
 
-			$sql_ary['SELECT'] .= ', u.user_lastvisit, s.session_last_visit, s.session_user_id, s.session_ip';
+			$sql_ary['SELECT'] .= ', s.session_user_id, s.session_ip';
 
 			$sql_ary['LEFT_JOIN'][] = array(
 				'FROM'	=> array(
 					SESSIONS_TABLE => 's',
 				),
 				'ON'	=> 's.session_user_id = u.user_id',
-				'AND'	=> 's.session_last_visit = u.user_lastvisit',
 			);
 
 			$event['sql_ary'] = $sql_ary;
 		}
 	}
 
-	/**
-	 * Now we can play with it, the users's session IP saves our day
-	 */
+	/* Now we can play with it, the users's session IP saves our day */
 	public function users_online_string_flags($event)
 	{
-		/**
-		 * Check permission prior to run the code
-		 */
+		/* Check permission before to run the code */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$rowset = $event['rowset'];
@@ -191,6 +172,8 @@ class listener implements EventSubscriberInterface
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}
+
+			// note to self: avoid sizeof?
 
 			if (sizeof($username))
 			{
