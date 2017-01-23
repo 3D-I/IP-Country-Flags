@@ -4,8 +4,8 @@ Changes Log of IPCF 31-32
 - v1.0.0-b2
 ---------------------------------------------------------------------
 * TASK: using TWIG syntax where applicable
-* BUG:  viewtopic multiflags         - Issue #3
-* BUG:  users online list multiflags - Issue #4
+* BUG:  viewtopic false flags        - Issue #3 FIXED
+* BUG:  users online list multiflags - Issue #4 WIP
 * 
 * 
 * 
@@ -25,7 +25,7 @@ Changes Log of IPCF 31-32
 * NEW: new IP lookup service
 * NEW: new language file
 * NEW: new ext.php with mandatory requisites check
-* NEW: added Copyright on footer
+* NEW: added Copyright notice on footer
 * WIP: Avatars stuff
 * WIP: caching where is possible
 *
