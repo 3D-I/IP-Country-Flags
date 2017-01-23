@@ -38,8 +38,9 @@ if (empty($lang) || !is_array($lang))
 */
 
 $lang = array_merge($lang, array(
-	'COUNTRY'			=> 'IP from: ',
-	'POWERED_BY_IPCF'	=>	' - %s',
+	'COUNTRY'					=>	'IP from: ',
+	'POWERED_BY_IPCF'			=>	' | %s',
+	'POWERED_BY_IPCF_DETAILS'	=>	'"<a href="http://3di.space/32/">IP Country Flag</a> &copy;3Di"',
 
 	'country' => array(
 		'AX'	=> 'Åland Islands',
