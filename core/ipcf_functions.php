@@ -57,7 +57,7 @@ class ipcf_functions
 		$sql = 'SELECT DISTINCT session_ip
 			FROM ' . SESSIONS_TABLE . '
 				WHERE session_user_id = ' . $user_id . '
-					AND ' . $user_id . ' > ' . ANONYMOUS . '';
+				AND ' . $user_id . ' > ' . ANONYMOUS . '';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 
@@ -129,7 +129,7 @@ class ipcf_functions
 		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl_handle, CURLOPT_URL, 'freegeoip.net/json/' . $user_session_ip);
 
-		/* return (string) or false (bool) */
+		/* @return mixed The IP data array, or false if error */
 		$ip_query = curl_exec($curl_handle);
 
 		$http_code	= curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
