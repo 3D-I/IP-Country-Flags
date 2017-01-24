@@ -59,6 +59,7 @@ class ipcf_functions
 				WHERE session_user_id = ' . $user_id . '
 				AND ' . $user_id . ' > ' . ANONYMOUS . '';
 		$result = $this->db->sql_query($sql);
+
 		$row = $this->db->sql_fetchrow($result);
 
 		$user_session_ip = $row['session_ip'];

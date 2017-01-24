@@ -121,7 +121,7 @@ class listener implements EventSubscriberInterface
 	{
 		$this->template->assign_vars(array(
 			'S_IPCF'			=>	($this->auth->acl_get('u_allow_ipcf')) ? true : false,
-			'IPCF_CREDIT_LINE'	=>	$this->user->lang('POWERED_BY_IPCF', '<a href="http://3di.space/32/">IP Country Flag</a> &copy; 3Di'), // Don't remove this line please.
+			'IPCF_CREDIT_LINE'	=>	$this->user->lang('POWERED_BY_IPCF', $this->user->lang('POWERED_BY_IPCF_DETAILS')),
 		));
 	}
 
@@ -133,12 +133,14 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$user_id = $event['post_row']['POSTER_ID'];
+
 			/**
 			 * The Flag Image itself lies here
 			*/
-			$country_flag = $this->ipcf_functions->user_session_flag( (int) $user_id);
+			$country_flag = $this->ipcf_functions->user_session_flag((int) $user_id);
 
 			$flag_output = array('COUNTRY_FLAG'	=>	$country_flag);
+
 			$event['post_row'] = array_merge($event['post_row'], $flag_output);
 		}
 	}
@@ -156,17 +158,9 @@ class listener implements EventSubscriberInterface
 		{
 			$sql_ary = $event['sql_ary'];
 
-			$sql_ary['SELECT'] .= ', u.user_lastvisit, s.session_last_visit, s.session_start, s.session_user_id, s.session_ip';
-
-			$sql_ary['LEFT_JOIN'][] = array(
-				'FROM'	=> array(
-					SESSIONS_TABLE => 's',
-				),
-				'ON'	=> 's.session_user_id = u.user_id AND s.session_ip = s.session_ip',
-			);
-
-			$order_my = ", s.session_start DESC";
-			$sql_ary['ORDER_BY'] .= $order_my;
+			/**
+			 * I just need the user_id for the next event to use
+			 */
 
 			$event['sql_ary'] = $sql_ary;
 		}
@@ -183,13 +177,15 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$rowset = $event['rowset'];
+
 			$online_userlist = $event['online_userlist'];
 
 			$username = $username_ipcf = array();
 
 			foreach ($rowset as $row)
 			{
-				$user_id_flag = $this->ipcf_functions->obtain_country_flag_string($row['session_ip']);
+				$user_id = $row['user_id'];
+				$user_id_flag = $this->ipcf_functions->user_session_flag((int) $user_id);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}

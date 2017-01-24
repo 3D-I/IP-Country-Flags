@@ -3,9 +3,9 @@ Changes Log of IPCF 31-32
 ---------------------------------------------------------------------
 - v1.0.0-b2
 ---------------------------------------------------------------------
-* TASK: using TWIG syntax where applicable
+* TASK: using TWIG syntax
 * BUG:  viewtopic false flags        - Issue #3 FIXED
-* BUG:  users online list multiflags - Issue #4 WIP
+* BUG:  users online list multiflags - Issue #4 FIXED
 * 
 * 
 * 
