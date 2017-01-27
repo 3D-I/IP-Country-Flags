@@ -48,30 +48,6 @@ class ipcf_functions
 	}
 
 	/**
-	 * Obtain suser_session_flag
-	 *
-	 * @return string user_session_flag for viewtopic
-	 */
-	public function user_session_flag($user_id)
-	{
-		$sql = 'SELECT DISTINCT session_ip
-			FROM ' . SESSIONS_TABLE . '
-				WHERE session_user_id = ' . $user_id . '
-				AND ' . $user_id . ' > ' . ANONYMOUS . '';
-		$result = $this->db->sql_query($sql);
-
-		$row = $this->db->sql_fetchrow($result);
-
-		$user_session_ip = $row['session_ip'];
-
-		$user_session_flag = $this->obtain_country_flag_string($user_session_ip);
-
-		$this->db->sql_freeresult($result);
-
-		return $user_session_flag;
-	}
-
-	/**
 	 * Returns whether cURL is available
 	 *
 	 * @return bool
@@ -117,81 +93,64 @@ class ipcf_functions
 		return $country_flag;
 	}
 
+
 	/**
-	 * Obtain Country Flag string from cURL
+	 * Obtain Country isocode from cURL
 	 *
 	 * @return string country_flag
 	 */
-	public function obtain_country_flag_string_curl($user_session_ip)
-	{
-		/* Some code borrowed from david63's Cookie Policy ext */
-		$curl_handle = curl_init();
-		curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
-		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl_handle, CURLOPT_URL, 'freegeoip.net/json/' . $user_session_ip);
-
-		/* @return mixed The IP data array, or false if error */
-		$ip_query = curl_exec($curl_handle);
-
-		$http_code	= curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
-		curl_close($curl_handle);
-
-		if ($ip_query)
-		{
-			/* Creating an array from string*/
-			$ip_array = @json_decode($ip_query, true);
-
-			if ( ($ip_array['country_code'] != '') && ($http_code == 200) )
-			{
-				$iso_country_code	=	strtolower($ip_array['country_code']);
-				$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
-				//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-			}
-			else
-			{
-				/**
-				 * error 403 forbidden (too many requests) or any other thing
-				 * WO represents my flag of World, aka Unknown IP
-				*/
-				$failure			=	ipcf_constants::FLAG_WORLD;
-				$iso_country_code	=	strtolower($failure);
-				$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
-				//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-			}
-		}
-		else
-		{
-			/**
-			 * http_code = 0, doing the dirty job here
-			 * WO represents my flag of World, aka Unknown IP
-			*/
-			$failure			=	ipcf_constants::FLAG_WORLD;
-			$iso_country_code	=	strtolower($failure);
-			$country_flag		=	$this->iso_to_flag_string_normal($iso_country_code);
-			//$country_flag		=	$this->iso_to_flag_string_small($iso_country_code);
-		}
-
-		return ($country_flag);
-	}
-
-	/**
-	 * Obtain Country Flag string
-	 *
-	 * @return string country_flag
-	 */
-	public function obtain_country_flag_string($user_session_ip)
+	public function obtain_country_isocode_curl($user_session_ip)
 	{
 		/**
-		 * First we check if cURL is available here
+		 * First check wheter cURL is available
 		*/
 		$is_curl = $this->is_curl();
 
 		if ($is_curl)
 		{
-			$country_flag = ( $this->obtain_country_flag_string_curl($user_session_ip) );
+			/* Some code borrowed from david63's Cookie Policy ext */
+			$curl_handle = curl_init();
+			curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
+			curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl_handle, CURLOPT_URL, 'freegeoip.net/json/' . $user_session_ip);
+
+			/* @return mixed The IP data array, or false if error */
+			$ip_query = curl_exec($curl_handle);
+
+			$http_code	= curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+			curl_close($curl_handle);
+
+			if ($ip_query)
+			{
+				/* Creating an array from string*/
+				$ip_array = @json_decode($ip_query, true);
+
+				if ( ($ip_array['country_code'] != '') && ($http_code == 200) )
+				{
+					$iso_country_code	=	strtolower($ip_array['country_code']);
+				}
+				else
+				{
+					/**
+					 * error 403 forbidden (too many requests) or any other thing
+					 * WO represents my flag of World, aka Unknown IP
+					*/
+					$failure			=	ipcf_constants::FLAG_WORLD;
+					$iso_country_code	=	strtolower($failure);
+				}
+			}
+			else
+			{
+				/**
+				 * http_code = 0, doing the dirty job here
+				 * WO represents my flag of World, aka Unknown IP
+				*/
+				$failure			=	ipcf_constants::FLAG_WORLD;
+				$iso_country_code	=	strtolower($failure);
+			}
 		}
 		/**
-		 * No cURL? That shouldn't happen but..
+		 * No cURL? That shouldn't happens but..
 		*/
 		else
 		{
@@ -199,6 +158,6 @@ class ipcf_functions
 			$country_flag	=	strtolower($failure);
 		}
 
-		return ($country_flag);
+		return ($iso_country_code);
 	}
 }

@@ -7,9 +7,9 @@ services:
             - '@config'
             - '@dbal.conn'
             - '@user'
+            - '@request'
             - '@template'
             - '@threedi.ipcf.ipcf_functions'
-
         tags:
             - { name: event.listener }
 
