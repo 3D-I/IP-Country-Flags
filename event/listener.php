@@ -122,6 +122,9 @@ class listener implements EventSubscriberInterface
 					AND s.session_time >= ' . (time() - $this->config['session_length']) . '
 					AND u.user_id = s.session_user_id';
 			$result = $this->db->sql_query($sql);
+			/**
+			 * Let's push/update the user_isocode
+			 */
 			while ($row = $this->db->sql_fetchrow($result))
 			{
 				$s_user_ip = (string) $row['session_ip'];
