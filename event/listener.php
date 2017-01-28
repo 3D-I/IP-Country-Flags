@@ -204,18 +204,17 @@ class listener implements EventSubscriberInterface
 			/**
 			 * The Flag Image itself lies here
 			*/
-			$sql = 'SELECT user_id, user_isocode
-				FROM ' . USERS_TABLE . '
-				WHERE user_id > ' . ANONYMOUS . '
-					AND user_id = ' . (int) $user_id . '';
+			$sql = 'SELECT user_id, user_isocode, s.session_time
+				FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
+				WHERE u.user_id > ' . ANONYMOUS . '
+					AND s.session_time >= ' . (time() - $this->config['session_length']) . '
+					AND u.user_id = ' . (int) $user_id . '';
 			$result = $this->db->sql_query($sql);
-			$row2 = $this->db->sql_fetchrow($result);
+			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 
-			$user_isocode = (string) $row2['user_isocode'];
-
+			$user_isocode = (string) $row['user_isocode'];
 			$country_flag = $this->ipcf_functions->iso_to_flag_string_small($user_isocode);
-
 			$flag_output = array('COUNTRY_FLAG'	=>	$country_flag);
 
 			$event['post_row'] = array_merge($event['post_row'], $flag_output);
