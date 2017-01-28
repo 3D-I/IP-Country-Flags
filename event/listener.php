@@ -116,10 +116,11 @@ class listener implements EventSubscriberInterface
 			 */
 			$user_data = $event['user_data'];
 
-			$sql = 'SELECT u.user_id, s.session_user_id, session_ip
+			$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, session_ip
 				FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
 				WHERE u.user_id > ' . ANONYMOUS . '
-				AND u.user_id = s.session_user_id';
+					AND s.session_time >= ' . (time() - $this->config['session_length']) . '
+					AND u.user_id = s.session_user_id';
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result))
 			{
@@ -132,7 +133,7 @@ class listener implements EventSubscriberInterface
 				$sql = 'UPDATE ' . USERS_TABLE . '
 					SET user_isocode = "' . $ip_to_isocode . '"
 					WHERE user_id > ' . ANONYMOUS . '
-						AND user_id = ' . $s_user_id . '';
+						AND user_id = ' . (int) $s_user_id . '';
 				$this->db->sql_query($sql);
 			}
 			$this->db->sql_freeresult($result);
@@ -203,7 +204,7 @@ class listener implements EventSubscriberInterface
 			$sql = 'SELECT user_id, user_isocode
 				FROM ' . USERS_TABLE . '
 				WHERE user_id > ' . ANONYMOUS . '
-					AND user_id = ' . $user_id . '';
+					AND user_id = ' . (int) $user_id . '';
 			$result = $this->db->sql_query($sql);
 			$row2 = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
@@ -254,7 +255,7 @@ class listener implements EventSubscriberInterface
 			foreach ($rowset as $row)
 			{
 				$user_isocode = $row['user_isocode'];
-				$user_id = $row['user_id'];
+				$user_id = (int) $row['user_id'];
 				$user_id_flag = $this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
