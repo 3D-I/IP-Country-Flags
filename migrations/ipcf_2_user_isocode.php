@@ -26,7 +26,7 @@ class ipcf_2_user_isocode extends \phpbb\db\migration\migration
 		return array(
 			'add_columns'	=> array(
 				$this->table_prefix . 'users'	=> array(
-					'user_isocode'	=> array('VCHAR:30', ''),
+					'user_isocode'	=> array('VCHAR:30', 'wo'),
 				),
 			),
 		);

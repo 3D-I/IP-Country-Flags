@@ -76,7 +76,7 @@ class listener implements EventSubscriberInterface
 		$this->ipcf_functions	=	$ipcf_functions;
 	}
 
-	/* Config time for cache, hinerits from View online time span */
+	///* Config time for cache, hinerits from View online time span */
 	//$config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
 	// if empty($this->user->data['user_avatar']) // just a note to self ;)
 
@@ -94,7 +94,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Main language file inclusion
+	 * Main language file inclusion and user's isocode
 	 */
 	public function load_language_on_setup($event)
 	{
@@ -104,6 +104,41 @@ class listener implements EventSubscriberInterface
 			'lang_set' => 'ipcf',
 		);
 		$event['lang_set_ext'] = $lang_set_ext;
+
+		/**
+		 * Check permission prior to run the code
+		 */
+		if ($this->auth->acl_get('u_allow_ipcf'))
+		{
+			/**
+			 * This part assigns/updates the user's isocode on login/registration
+			 * Obtaining a univoque isocode per user/session
+			 */
+			$user_data = $event['user_data'];
+
+			$sql = 'SELECT u.user_id, s.session_user_id, session_ip
+				FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
+				WHERE u.user_id > ' . ANONYMOUS . '
+				AND u.user_id = s.session_user_id';
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$s_user_ip = (string) $row['session_ip'];
+
+				$ip_to_isocode = $this->ipcf_functions->obtain_country_isocode_curl($s_user_ip);
+
+				$s_user_id = (int) $row['session_user_id'];
+
+				$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_isocode = "' . $ip_to_isocode . '"
+					WHERE user_id > ' . ANONYMOUS . '
+						AND user_id = ' . $s_user_id . '';
+				$this->db->sql_query($sql);
+			}
+			$this->db->sql_freeresult($result);
+
+			$event['user_data'] = $user_data;
+		}
 	}
 
 	/**
@@ -150,26 +185,6 @@ class listener implements EventSubscriberInterface
 		 * I can't use the Null Coalescing Operator (PHP7) here because of BC with phpBB 3.1.x
 		 */
 		$ip_check = ($this->request->server('HTTP_CF_CONNECTING_IP') != '') ? htmlspecialchars_decode($this->request->server('HTTP_CF_CONNECTING_IP')) : htmlspecialchars_decode($this->request->server('REMOTE_ADDR'));
-		/**
-		 * This part assigns/updates the user session's isocode on login/registration
-		 * Obtaining a univoque isocode per session
-		 * The goal is to save as much queries I can
-		 */
-		$ip_to_isocode = $this->ipcf_functions->obtain_country_isocode_curl($ip_check);
-
-		$sql = 'SELECT u.user_id, s.session_id, s.session_user_id
-			FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
-			WHERE u.user_id = s.session_user_id';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-
-		$s_user_id = (int) $row['session_user_id'];
-
-		$sql = 'UPDATE ' . USERS_TABLE . '
-			SET user_isocode = "' . $ip_to_isocode . '"
-			WHERE user_id = ' . $s_user_id . '';
-		$this->db->sql_query($sql);
 
 		$event['ip'] = $ip_check;
 	}
@@ -185,18 +200,17 @@ class listener implements EventSubscriberInterface
 			/**
 			 * The Flag Image itself lies here
 			*/
-			$sql = 'SELECT DISTINCT user_id, user_isocode
+			$sql = 'SELECT user_id, user_isocode
 				FROM ' . USERS_TABLE . '
-				WHERE user_id = ' . $user_id . '
-					';
-
+				WHERE user_id > ' . ANONYMOUS . '
+					AND user_id = ' . $user_id . '';
 			$result = $this->db->sql_query($sql);
 			$row2 = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 
 			$user_isocode = (string) $row2['user_isocode'];
-//--------- this @ masks a bug or an issue "unknown index" but the isocode is retrieved ---
-			$country_flag = @$this->ipcf_functions->iso_to_flag_string_small($user_isocode);
+
+			$country_flag = $this->ipcf_functions->iso_to_flag_string_small($user_isocode);
 
 			$flag_output = array('COUNTRY_FLAG'	=>	$country_flag);
 
@@ -205,7 +219,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * We need the availability of the user's user_isocode
+	 * We need the availability of the user's isocode
 	 * for the event "users_online_string_flags", the next event's rowset
 	 */
 	public function ipcf_obtain_users_online_string_sql_add($event)
@@ -224,7 +238,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Now we can play with it, the users's user_id saves our day
+	 * Now we can play with it, the users's isocode saves our day
 	 */
 	public function users_online_string_flags($event)
 	{
@@ -237,13 +251,11 @@ class listener implements EventSubscriberInterface
 			$online_userlist = $event['online_userlist'];
 
 			$username = $username_ipcf = array();
-
 			foreach ($rowset as $row)
 			{
 				$user_isocode = $row['user_isocode'];
-
 				$user_id = $row['user_id'];
-				$user_id_flag = @$this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
+				$user_id_flag = $this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}
