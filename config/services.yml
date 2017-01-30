@@ -16,6 +16,7 @@ services:
     threedi.ipcf.ipcf_functions:
         class: threedi\ipcf\core\ipcf_functions
         arguments:
+            - '@config'
             - '@dbal.conn'
             - '@user'
             - '@ext.manager'

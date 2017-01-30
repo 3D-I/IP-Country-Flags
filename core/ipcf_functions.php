@@ -12,6 +12,9 @@ use threedi\ipcf\core\ipcf_constants;
 
 class ipcf_functions
 {
+	/** @var \phpbb\config\config */
+	protected $config;
+
 	/** @var \phpbb\db\driver\driver */
 	protected $db;
 
@@ -27,24 +30,27 @@ class ipcf_functions
 	/**
 	 * Constructor
 	 *
+	* @param \phpbb\config\config			$config				Config Object
 	 * @param \phpbb\db\driver\driver		$db					Database object
 	 * @param \phpbb\user					$user				User object
 	 * @param \phpbb\extension\manager		$ext_manager		Extension manager object
 	 * @param \phpbb\path_helper			$path_helper		Path helper object
 	 */
 	public function __construct(
+			\phpbb\config\config $config,
 			\phpbb\db\driver\driver_interface $db,
 			\phpbb\user $user,
 			\phpbb\extension\manager $ext_manager,
 			\phpbb\path_helper $path_helper)
 	{
-		$this->db			= $db;
-		$this->user			= $user;
-		$this->ext_manager	= $ext_manager;
-		$this->path_helper	= $path_helper;
+		$this->config		=	$config;
+		$this->db			=	$db;
+		$this->user			=	$user;
+		$this->ext_manager	=	$ext_manager;
+		$this->path_helper	=	$path_helper;
 
-		$this->ext_path		= $this->ext_manager->get_extension_path('threedi/ipcf', true);
-		$this->ext_path_web	= $this->path_helper->update_web_root_path($this->ext_path);
+		$this->ext_path		=	$this->ext_manager->get_extension_path('threedi/ipcf', true);
+		$this->ext_path_web	=	$this->path_helper->update_web_root_path($this->ext_path);
 	}
 
 	/**
@@ -92,7 +98,6 @@ class ipcf_functions
 
 		return $country_flag;
 	}
-
 
 	/**
 	 * Obtain Country isocode from cURL
@@ -159,5 +164,42 @@ class ipcf_functions
 		}
 
 		return ($iso_country_code);
+	}
+
+
+	/**
+	 * Obtain Country isocode from cURL
+	 *
+	 * @return string session user's isocode
+	 */
+	public function obtain_user_isocode($user_isocode = null)
+	{
+		$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, session_ip
+			FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
+			WHERE u.user_id > ' . ANONYMOUS . '
+				AND s.session_time >= ' . (time() - $this->config['session_length']) . '
+				AND u.user_id = s.session_user_id';
+		$result = $this->db->sql_query($sql);
+
+		/**
+		 * Let's push/update the user_isocode
+		 */
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$s_user_ip = (string) $row['session_ip'];
+
+			$ip_to_isocode = $this->obtain_country_isocode_curl($s_user_ip);
+
+			$s_user_id = (int) $row['session_user_id'];
+
+			$sql = 'UPDATE ' . USERS_TABLE . '
+				SET user_isocode = "' . $ip_to_isocode . '"
+				WHERE user_id > ' . ANONYMOUS . '
+					AND user_id = ' . (int) $s_user_id . '';
+			$this->db->sql_query($sql);
+		}
+		$this->db->sql_freeresult($result);
+
+		return($user_isocode);
 	}
 }

@@ -47,8 +47,8 @@ class listener implements EventSubscriberInterface
 		* Constructor
 		*
 		* @param \phpbb\auth\auth					$auth				Authentication object
-		* @param \phpbb\cache\service				$cache
-		* @param \phpbb\config\config				$config				Config Object
+		* @param \phpbb\cache\service				$cache										NOT in use here
+		* @param \phpbb\config\config				$config				Config Object			NOT in use here
 		* @param \phpbb\db\driver\driver			$db					Database object
 		* @param \phpbb\user						$user				User Object
 		* @param \phpbb\request\request				$request			Request object
@@ -87,6 +87,7 @@ class listener implements EventSubscriberInterface
 			'core.permissions'							=>	'permissions',
 			'core.page_header_after'					=>	'icpf_template_switch',
 			'core.session_ip_after'						=>	'ipcf_no_cloudflare',
+			'core.viewtopic_cache_user_data'			=>	'viewtopic_cache_user_data',
 			'core.viewtopic_modify_post_row'			=>	'viewtopic_flags',
 			'core.obtain_users_online_string_sql'		=>	'ipcf_obtain_users_online_string_sql_add',
 			'core.obtain_users_online_string_modify'	=>	'users_online_string_flags',
@@ -110,36 +111,13 @@ class listener implements EventSubscriberInterface
 		 */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
+			$user_data = $event['user_data'];
+
 			/**
 			 * This part assigns/updates the user's isocode on login/registration
 			 * Obtaining a univoque isocode per user/session
 			 */
-			$user_data = $event['user_data'];
-
-			$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, session_ip
-				FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
-				WHERE u.user_id > ' . ANONYMOUS . '
-					AND s.session_time >= ' . (time() - $this->config['session_length']) . '
-					AND u.user_id = s.session_user_id';
-			$result = $this->db->sql_query($sql);
-			/**
-			 * Let's push/update the user_isocode
-			 */
-			while ($row = $this->db->sql_fetchrow($result))
-			{
-				$s_user_ip = (string) $row['session_ip'];
-
-				$ip_to_isocode = $this->ipcf_functions->obtain_country_isocode_curl($s_user_ip);
-
-				$s_user_id = (int) $row['session_user_id'];
-
-				$sql = 'UPDATE ' . USERS_TABLE . '
-					SET user_isocode = "' . $ip_to_isocode . '"
-					WHERE user_id > ' . ANONYMOUS . '
-						AND user_id = ' . (int) $s_user_id . '';
-				$this->db->sql_query($sql);
-			}
-			$this->db->sql_freeresult($result);
+			$this->ipcf_functions->obtain_user_isocode();
 
 			$event['user_data'] = $user_data;
 		}
@@ -161,7 +139,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* template switch over all
+	* Template switches over all
 	*/
 	public function icpf_template_switch($event)
 	{
@@ -183,7 +161,7 @@ class listener implements EventSubscriberInterface
 		$ip_check = $event['ip'];
 
 		/**
-		 * Is Cloudflare in action?
+		 * Is Cloudflare in action? If yes means nof correct Flags ^__O
 		 * htmlspecialchars_decode returns a (string) already.
 		 * Ternary Operators improve performance.
 		 * I can't use the Null Coalescing Operator (PHP7) here because of BC with phpBB 3.1.x
@@ -193,6 +171,28 @@ class listener implements EventSubscriberInterface
 		$event['ip'] = $ip_check;
 	}
 
+	/**
+	 * Modify the users' data displayed with their posts
+	 *
+	 * @event core.viewtopic_cache_user_data
+	 * @var	array	user_cache_data	Array with the user's data
+	 * @var	int		poster_id		Poster's user id
+	 * @var	array	row				Array with original user and post data
+	 * @since 3.1.0-a1
+	 */
+	public function viewtopic_cache_user_data($event)
+	{
+		$array = $event['user_cache_data'];
+
+		/**
+		 * Inspired by Annual Stars ext
+		 */
+		$user_isocode = $event['row']['user_isocode'];
+		$array['user_isocode'] = $this->ipcf_functions->iso_to_flag_string_small($user_isocode);
+
+		$event['user_cache_data'] = $array;
+	}
+
 	public function viewtopic_flags($event)
 	{
 		/**
@@ -200,24 +200,10 @@ class listener implements EventSubscriberInterface
 		 */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
-			$user_id = $event['post_row']['POSTER_ID'];
 			/**
-			 * The Flag Image itself lies here
-			*/
-			$sql = 'SELECT user_id, user_isocode, s.session_time
-				FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
-				WHERE u.user_id > ' . ANONYMOUS . '
-					AND s.session_time >= ' . (time() - $this->config['session_length']) . '
-					AND u.user_id = ' . (int) $user_id . '';
-			$result = $this->db->sql_query($sql);
-			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-
-			$user_isocode = (string) $row['user_isocode'];
-			$country_flag = $this->ipcf_functions->iso_to_flag_string_small($user_isocode);
-			$flag_output = array('COUNTRY_FLAG'	=>	$country_flag);
-
-			$event['post_row'] = array_merge($event['post_row'], $flag_output);
+			 * Inspired by Annual Stars ext
+			 */
+			$event['post_row'] = array_merge($event['post_row'], array('COUNTRY_FLAG' => $event['user_poster_data']['user_isocode']));
 		}
 	}
 

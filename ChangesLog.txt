@@ -4,13 +4,13 @@ Changes Log of IPCF 31-32
 - v1.0.0-b3
 ---------------------------------------------------------------------
 * WIP:  using TWIG syntax
-* TASK: re-engeneering the code, house-keeping
-* WIP:  IP Lookups saving
-* WIP:  SQL queries saving
 * WIP:  Default session's Country Avatar
 * WIP:  Cacheing where is possible
+* TASK: re-engeneering the code, house-keeping
+* NEW:  IP Lookups CUT-OFF
+* NEW:  SQL queries CUT-OFF
 * NEW:  Cloudflare support integration
-* NEW:  Using small flags for viewtopic, GFX consinstency.
+* NEW:  Using small flags for viewtopic, GFX consistency.
 * NEW:  One migration file added ("user_isocode" in users table)
 
 ---------------------------------------------------------------------
