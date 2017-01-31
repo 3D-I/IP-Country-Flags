@@ -4,9 +4,9 @@ Changes Log of IPCF 31-32
 - v1.0.0-b3
 ---------------------------------------------------------------------
 * WIP:  using TWIG syntax
-* WIP:  Default session's Country Avatar
 * WIP:  Cacheing where is possible
 * TASK: re-engeneering the code, house-keeping
+* NEW:  Default session's IP Country Flag Avatar if any.
 * NEW:  IP Lookups CUT-OFF
 * NEW:  SQL queries CUT-OFF
 * NEW:  Cloudflare support integration
@@ -14,7 +14,7 @@ Changes Log of IPCF 31-32
 * NEW:  One migration file added ("user_isocode" in users table)
 
 ---------------------------------------------------------------------
-- v1.0.0-b2-pre-release (private)
+- v1.0.0-b2-pre-release (internal)
 ---------------------------------------------------------------------
 * BUG:  viewtopic false flags        - Issue #3 FIXED
 * BUG:  users online list multiflags - Issue #4 FIXED

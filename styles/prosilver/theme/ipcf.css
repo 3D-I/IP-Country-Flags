@@ -13,9 +13,8 @@
 }
 
 .flag_image_avatar {
-	margin-left: 8px;
 	width: auto;
 	max-width: 80px;
-	max-height: auto;
-	vertical-align: middle;
+	max-height: 80px;
+	vertical-align: left;
 }

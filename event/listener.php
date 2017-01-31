@@ -172,27 +172,35 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Modify the users' data displayed with their posts
+	 * Modify the users' data displayed within their posts
 	 *
 	 * @event core.viewtopic_cache_user_data
-	 * @var	array	user_cache_data	Array with the user's data
-	 * @var	int		poster_id		Poster's user id
-	 * @var	array	row				Array with original user and post data
-	 * @since 3.1.0-a1
 	 */
 	public function viewtopic_cache_user_data($event)
 	{
-		$array = $event['user_cache_data'];
-
 		/**
-		 * Inspired by Annual Stars ext
+		 * Check permission prior to run the code
 		 */
-		$user_isocode = $event['row']['user_isocode'];
-		$array['user_isocode'] = $this->ipcf_functions->iso_to_flag_string_small($user_isocode);
+		if ($this->auth->acl_get('u_allow_ipcf'))
+		{
+			$array = $event['user_cache_data'];
+			/**
+			 * Inspired by Annual Stars ext
+			 */
+			$user_isocode = $event['row']['user_isocode'];
 
-		$event['user_cache_data'] = $array;
+			$array['user_isocode']	= (empty($array['user_isocode'])) ? @$this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
+
+			$array['avatar']		= ($this->user->data['user_id'] > ANONYMOUS) ? @$this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
+
+			$event['user_cache_data'] = $array;
+		}
 	}
-
+	/**
+	 * Modify the posts template block (using only post_row array)
+	 *
+	 * @event core.viewtopic_modify_post_row
+	 */
 	public function viewtopic_flags($event)
 	{
 		/**
@@ -203,7 +211,10 @@ class listener implements EventSubscriberInterface
 			/**
 			 * Inspired by Annual Stars ext
 			 */
-			$event['post_row'] = array_merge($event['post_row'], array('COUNTRY_FLAG' => $event['user_poster_data']['user_isocode']));
+			$event['post_row'] = array_merge($event['post_row'], array(
+				'POSTER_AVATAR'	=>	$event['user_poster_data']['avatar'],
+				'COUNTRY_FLAG'	=>	$event['user_poster_data']['user_isocode'])
+			);
 		}
 	}
 
@@ -244,7 +255,7 @@ class listener implements EventSubscriberInterface
 			{
 				$user_isocode = $row['user_isocode'];
 				$user_id = (int) $row['user_id'];
-				$user_id_flag = $this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
+				$user_id_flag = @$this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}

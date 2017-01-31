@@ -172,7 +172,7 @@ class ipcf_functions
 	 *
 	 * @return string session user's isocode
 	 */
-	public function obtain_user_isocode($user_isocode = null)
+	public function obtain_user_isocode($user_isocode = 0)
 	{
 		$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, session_ip
 			FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
