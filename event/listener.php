@@ -254,7 +254,6 @@ class listener implements EventSubscriberInterface
 			foreach ($rowset as $row)
 			{
 				$user_isocode = $row['user_isocode'];
-				$user_id = (int) $row['user_id'];
 				$user_id_flag = @$this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);

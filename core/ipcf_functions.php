@@ -159,8 +159,8 @@ class ipcf_functions
 		*/
 		else
 		{
-			$failure		=	ipcf_constants::FLAG_WORLD;
-			$country_flag	=	strtolower($failure);
+			$failure			=	ipcf_constants::FLAG_WORLD;
+			$iso_country_code	=	strtolower($failure);
 		}
 
 		return ($iso_country_code);

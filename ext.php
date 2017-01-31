@@ -44,7 +44,7 @@ class ext extends \phpbb\extension\base
 	 * Let's tell the user what exactly is going on and provide a back-link.
 	 * Using the User Object for BC.
 	 */
-	function verbose_it()
+	public function verbose_it()
 	{
 		$this->container->get('user')->add_lang_ext('threedi/ipcf', 'ext_require');
 
