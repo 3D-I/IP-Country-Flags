@@ -76,9 +76,10 @@ class listener implements EventSubscriberInterface
 		$this->ipcf_functions	=	$ipcf_functions;
 	}
 
-	///* Config time for cache, hinerits from View online time span */
-	//$config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
+	// /* Config time for cache, hinerits from View online time span */
+	// $config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
 	// if empty($this->user->data['user_avatar']) // just a note to self ;)
+	// 'avatar'		=> ($user->optionget('viewavatars')) ? phpbb_get_user_avatar($row) : '', (note to self)
 
 	static public function getSubscribedEvents()
 	{
@@ -175,6 +176,9 @@ class listener implements EventSubscriberInterface
 	 * Modify the users' data displayed within their posts
 	 *
 	 * @event core.viewtopic_cache_user_data
+	 * @var	array	user_cache_data	Array with the user's data
+	 * @var	int		poster_id		Poster's user id
+	 * @var	array	row				Array with original user and post data
 	 */
 	public function viewtopic_cache_user_data($event)
 	{
@@ -184,18 +188,20 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$array = $event['user_cache_data'];
-			/**
-			 * Inspired by Annual Stars ext
-			 */
-			$user_isocode = $event['row']['user_isocode'];
 
-			$array['user_isocode']	= (empty($array['user_isocode'])) ? @$this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
+			/* Inspired by Annual Stars ext */
+			$user_isocode = (string) $event['row']['user_isocode'];
+			$array['user_isocode']	=	(empty($array['user_isocode'])) ? @$this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
 
-			$array['avatar']		= ($this->user->data['user_id'] > ANONYMOUS) ? @$this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
+			$user_id = (int) $event['poster_id'];
+			// TODO ? compare with user's session time ?
+			$s_expired = (time() - $this->config['session_length']);
+			$array['avatar']	=	( empty($array['avatar']) && (!$s_expired) ) ? @$this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
 
 			$event['user_cache_data'] = $array;
 		}
 	}
+
 	/**
 	 * Modify the posts template block (using only post_row array)
 	 *
@@ -208,9 +214,7 @@ class listener implements EventSubscriberInterface
 		 */
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
-			/**
-			 * Inspired by Annual Stars ext
-			 */
+			/* Inspired by Annual Stars ext */
 			$event['post_row'] = array_merge($event['post_row'], array(
 				'POSTER_AVATAR'	=>	$event['user_poster_data']['avatar'],
 				'COUNTRY_FLAG'	=>	$event['user_poster_data']['user_isocode'])
