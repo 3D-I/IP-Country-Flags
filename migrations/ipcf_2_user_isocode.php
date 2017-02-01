@@ -10,10 +10,9 @@
 namespace threedi\ipcf\migrations;
 
 /*
-	* add permission to view IP Country Flags to the Registered Users Group
-	* Excluded are: BOTS, NEWLY REGISTERED, GUESTS
-	* It is possible to give them this permission in ACP/permissions, though.
-	*/
+ * Adds the index "user_isocode" to the USERS_TABLE
+ * Index is being populated with the default Flag "wo" (aka unknown IP)
+ */
 class ipcf_2_user_isocode extends \phpbb\db\migration\migration
 {
 	static public function depends_on()
@@ -25,8 +24,19 @@ class ipcf_2_user_isocode extends \phpbb\db\migration\migration
 	{
 		return array(
 			'add_columns'	=> array(
-				$this->table_prefix . 'users'	=> array(
+				$this->table_prefix . 'users'	=>	array(
 					'user_isocode'	=> array('VCHAR:30', 'wo'),
+				),
+			),
+		);
+	}
+
+	public function revert_schema()
+	{
+		return array(
+			'drop_columns'	=> array(
+				$this->table_prefix . 'users'	=>	array(
+					'user_isocode',
 				),
 			),
 		);

@@ -9,16 +9,22 @@
 
 namespace threedi\ipcf\migrations;
 
-/*
-	* add permission to view IP Country Flags to the Registered Users Group
-	* Excluded are: BOTS, NEWLY REGISTERED, GUESTS
-	* It is possible to give them this permission in ACP/permissions, though.
-	*/
+/**
+ * Add the (already activated) permission "view IP Country Flags" to the Registered Users Group(s)
+ * Inactive as per default for BOTS, NEWLY_REGISTERED and GUESTS.
+ */
 class ipcf_1_perms extends \phpbb\db\migration\migration
 {
+	public function effectively_installed()
+	{
+		/* If doesn't exists go ahead */
+		return !$this->db_tools->sql_index_exists($this->table_prefix . 'users', 'user_isocode');
+	}
+
 	static public function depends_on()
 	{
-		return array('\phpbb\db\migration\data\v310\dev');
+		/* This extension if for phpBB => 3.1.10 (OR) => 3.2.0 */
+		return array('\phpbb\db\migration\data\v31x\v3110');
 	}
 
 	public function update_data()
