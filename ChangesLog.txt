@@ -6,9 +6,9 @@ Changes Log of IPCF 31-32
 * WIP:  using TWIG syntax
 * WIP:  Cacheing where is possible
 * TASK: re-engeneering the code, house-keeping
-* NEW:  Default session's IP Country Flag Avatar if any.
-* NEW:  IP Lookups CUT-OFF
-* NEW:  SQL queries CUT-OFF
+* NEW:  Default last session's IP Country Flag Avatar.
+* NEW:  IP Lookups limited to one per users' session
+* NEW:  SQL queries limited to one per users' session
 * NEW:  Cloudflare support integration
 * NEW:  Using small flags for viewtopic, GFX consistency.
 * NEW:  One migration file added ("user_isocode" in users table)

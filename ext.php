@@ -21,30 +21,55 @@ class ext extends \phpbb\extension\base
 	 */
 	public function is_enableable()
 	{
-		/* @return bool */
-		$bb3110 = ( phpbb_version_compare(PHPBB_VERSION, '3.1.10', '>=') && phpbb_version_compare(PHPBB_VERSION, '3.2.0@dev', '<') );
-
-		/* @return bool */
-		$bb320 = ( phpbb_version_compare(PHPBB_VERSION, '3.2.0', '>=') );
-
-		/**
-		 * We rely on constants.php
-		 */
-		if ( ( ($bb320) || ($bb3110) ) && (function_exists('curl_version')) )
+		if ($this->curl_required() && ( $this->phpbb_ascraeus_requirements() || $this->phpbb_rhea_requirements() ))
 		{
 			return true;
 		}
 		else
 		{
-			SELF::verbose_it();
+			$this->verbose_it();
 		}
 	}
 
 	/**
-	 * Let's tell the user what exactly is going on and provide a back-link.
-	 * Using the User Object for BC.
+	 * Check PHP requirements
+	 * Requires cURL
+	 *
+	 * @return bool
 	 */
-	public function verbose_it()
+	protected function curl_required()
+	{
+		return function_exists('curl_version');
+	}
+
+	/**
+	 * Check phpBB 3.1 compatibility
+	 * Requires phpBB 3.1.10 or greater
+	 *
+	 * @return bool
+	 */
+	protected function phpbb_ascraeus_requirements()
+	{
+		return phpbb_version_compare(PHPBB_VERSION, '3.1.10', '>=') && phpbb_version_compare(PHPBB_VERSION, '3.2.0-dev', '<');
+	}
+
+	/**
+	 * Check phpBB 3.2 (and later) compatibility
+	 * Requires phpBB 3.2.0
+	 *
+	 * @return bool
+	 */
+	protected function phpbb_rhea_requirements()
+	{
+		return phpbb_version_compare(PHPBB_VERSION, '3.2.0', '>=');
+	}
+
+	/**
+	 * Let's tell the user what exactly is going on failure, provides a backlink.
+	 *
+	 * Using the User Object for the BC's sake.
+	 */
+	protected function verbose_it()
 	{
 		$this->container->get('user')->add_lang_ext('threedi/ipcf', 'ext_require');
 

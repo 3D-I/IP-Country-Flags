@@ -47,8 +47,8 @@ class listener implements EventSubscriberInterface
 		* Constructor
 		*
 		* @param \phpbb\auth\auth					$auth				Authentication object
-		* @param \phpbb\cache\service				$cache										NOT in use here
-		* @param \phpbb\config\config				$config				Config Object			NOT in use here
+		* @param \phpbb\cache\service				$cache										NOT in use yet
+		* @param \phpbb\config\config				$config				Config Object
 		* @param \phpbb\db\driver\driver			$db					Database object
 		* @param \phpbb\user						$user				User Object
 		* @param \phpbb\request\request				$request			Request object
@@ -75,11 +75,6 @@ class listener implements EventSubscriberInterface
 		$this->template			=	$template;
 		$this->ipcf_functions	=	$ipcf_functions;
 	}
-
-	// /* Config time for cache, hinerits from View online time span */
-	// $config_time_cache = ( (int) ($this->config['load_online_time'] * 60) ); // not yet in use
-	// if empty($this->user->data['user_avatar']) // just a note to self ;)
-	// 'avatar'		=> ($user->optionget('viewavatars')) ? phpbb_get_user_avatar($row) : '', (note to self)
 
 	static public function getSubscribedEvents()
 	{
@@ -176,9 +171,6 @@ class listener implements EventSubscriberInterface
 	 * Modify the users' data displayed within their posts
 	 *
 	 * @event core.viewtopic_cache_user_data
-	 * @var	array	user_cache_data	Array with the user's data
-	 * @var	int		poster_id		Poster's user id
-	 * @var	array	row				Array with original user and post data
 	 */
 	public function viewtopic_cache_user_data($event)
 	{
@@ -189,21 +181,31 @@ class listener implements EventSubscriberInterface
 		{
 			$array = $event['user_cache_data'];
 
-			/* Inspired by Annual Stars ext */
+			/**
+			 *Migration rules, a default user_isocode is always present (wo)
+			 */
 			$user_isocode = (string) $event['row']['user_isocode'];
-			$array['user_isocode']	=	(empty($array['user_isocode'])) ? @$this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
+			$array['user_isocode']	=	(empty($array['user_isocode'])) ? $this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
 
+			/**
+			 * A default Country Flag avatar is being assigned
+			 * to all those users who have posted (mini-profile next to posts).
+			 * Only to those who doesn't have one.
+			 * As per default the WO flag (unknown IP) is shown untill
+			 * those users will log back in, then the correct Flag based on their IPs
+			 * will be updated in the DB.
+			 *
+			 * Since IPCF 1.0.0-b3.
+			 */
 			$user_id = (int) $event['poster_id'];
-			// TODO ? compare with user's session time ?
-			$s_expired = (time() - $this->config['session_length']);
-			$array['avatar']	=	( empty($array['avatar']) && (!$s_expired) ) ? @$this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
+			$array['avatar'] = (empty($array['avatar'])) ? $this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
 
 			$event['user_cache_data'] = $array;
 		}
 	}
 
 	/**
-	 * Modify the posts template block (using only post_row array)
+	 * Modify the posts template block
 	 *
 	 * @event core.viewtopic_modify_post_row
 	 */
@@ -258,7 +260,7 @@ class listener implements EventSubscriberInterface
 			foreach ($rowset as $row)
 			{
 				$user_isocode = $row['user_isocode'];
-				$user_id_flag = @$this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
+				$user_id_flag = $this->ipcf_functions->iso_to_flag_string_normal($user_isocode);
 				$username[] = $row['username'];
 				$username_ipcf[] = ($user_id_flag . ' ' . $row['username']);
 			}

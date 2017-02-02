@@ -23,7 +23,6 @@ class ipcf_1_perms extends \phpbb\db\migration\migration
 
 	static public function depends_on()
 	{
-		/* This extension if for phpBB => 3.1.10 (OR) => 3.2.0 */
 		return array('\phpbb\db\migration\data\v31x\v3110');
 	}
 
