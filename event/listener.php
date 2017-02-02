@@ -197,7 +197,6 @@ class listener implements EventSubscriberInterface
 			 *
 			 * Since IPCF 1.0.0-b3.
 			 */
-			$user_id = (int) $event['poster_id'];
 			$array['avatar'] = (empty($array['avatar'])) ? $this->ipcf_functions->iso_to_flag_string_avatar($user_isocode) : $array['avatar'];
 
 			$event['user_cache_data'] = $array;

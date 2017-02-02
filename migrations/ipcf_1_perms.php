@@ -15,12 +15,6 @@ namespace threedi\ipcf\migrations;
  */
 class ipcf_1_perms extends \phpbb\db\migration\migration
 {
-//	public function effectively_installed()
-//	{
-//		/* If doesn't exists go ahead */
-//		return !$this->db_tools->sql_index_exists($this->table_prefix . 'users', 'user_isocode');
-//	}
-
 	static public function depends_on()
 	{
 		return array('\phpbb\db\migration\data\v31x\v3110');
