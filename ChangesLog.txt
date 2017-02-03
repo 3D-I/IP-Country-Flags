@@ -12,7 +12,7 @@ Changes Log of IPCF 31-32
 * NEW:  Cloudflare IPs unmasker integration
 * NEW:  Using small flags for viewtopic, GFX consistency.
 * NEW:  A migration file added ("user_isocode" in users table)
-* FIX:  BUG -> Users's online list's multisessions Country Flags (finally!)
+* FIX:  BUG -> Users online list's multisessions Country Flags (finally!)
 
 ---------------------------------------------------------------------
 - v1.0.0-b2-pre-release (internal)
