@@ -4,12 +4,13 @@
 	"description": "A kind of Country Flags invasion for your phpBB",
 	"homepage": "http://3di.space/32/",
 	"version": "1.0.0-b3",
+	"time": "03-02-2017",
 	"license": "GPL-2.0",
 	"authors": [
 		{
-			"name": "3Di",
-			"homepage": "http://3di.space/32/",
-			"role": "Lead Developer"
+		"name": "3Di",
+		"homepage": "http://3di.space/32/",
+		"role": "Lead Developer"
 		}
 	],
 	"require": {
@@ -21,8 +22,7 @@
 		"soft-require": {
 			"phpbb/phpbb": ">=3.1.10,<3.3.0@dev"
 		},
-		"version-check":
-		{
+		"version-check": {
 			"host": "3d-i.github.io",
 			"directory": "/site/vchecks",
 			"filename": "ipcf-vcheck.json"

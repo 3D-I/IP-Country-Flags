@@ -23,7 +23,7 @@ class listener implements EventSubscriberInterface
 	protected $auth;
 
 	/** @var \phpbb\cache\service */
-	protected $cache;
+	protected $cache; // NOT yet in use (do we need this object?)
 
 	/** @var \phpbb\config\config */
 	protected $config;
@@ -47,7 +47,7 @@ class listener implements EventSubscriberInterface
 		* Constructor
 		*
 		* @param \phpbb\auth\auth					$auth				Authentication object
-		* @param \phpbb\cache\service				$cache										NOT in use yet
+		* @param \phpbb\cache\service				$cache		(NOT yet in use             )
 		* @param \phpbb\config\config				$config				Config Object
 		* @param \phpbb\db\driver\driver			$db					Database object
 		* @param \phpbb\user						$user				User Object
@@ -92,6 +92,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Main language file inclusion and user's isocode
+	 *
+	 * @event core.user_setup
 	 */
 	public function load_language_on_setup($event)
 	{
@@ -111,7 +113,8 @@ class listener implements EventSubscriberInterface
 
 			/**
 			 * This part assigns/updates the user's isocode on login/registration
-			 * Obtaining a univoque isocode per user/session
+			 *
+			 * Obtains a univoque isocode per user/session
 			 */
 			$this->ipcf_functions->obtain_user_isocode();
 
@@ -121,6 +124,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Permission's language file is automatically loaded
+	 *
+	 * @event core.permissions
 	 */
 	public function permissions($event)
 	{
@@ -135,8 +140,10 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Template switches over all
-	*/
+	 * Template switches over all
+	 *
+	 * @event core.page_header_after
+	 */
 	public function icpf_template_switch($event)
 	{
 		$this->template->assign_vars(array(
@@ -182,18 +189,17 @@ class listener implements EventSubscriberInterface
 			$array = $event['user_cache_data'];
 
 			/**
-			 *Migration rules, a default user_isocode is always present (wo)
+			 * The migration here rules, a default user_isocode is always present (wo)
 			 */
 			$user_isocode = (string) $event['row']['user_isocode'];
 			$array['user_isocode']	=	(empty($array['user_isocode'])) ? $this->ipcf_functions->iso_to_flag_string_small($user_isocode) : '';
 
 			/**
-			 * A default Country Flag avatar is being assigned
-			 * to all those users who have posted (mini-profile next to posts).
-			 * Only to those who doesn't have one.
-			 * As per default the WO flag (unknown IP) is shown untill
-			 * those users will log back in, then the correct Flag based on their IPs
-			 * will be updated in the DB.
+			 * A default Country Flag avatar is being assigned in view-topic
+			 * for those users who posted and don't have one already.
+			 *
+			 * The WO (World) flag (unknown IP) is shown by default until
+			 * they log back in then the DB will be updated with the latests iso_code.
 			 *
 			 * Since IPCF 1.0.0-b3.
 			 */
@@ -226,6 +232,8 @@ class listener implements EventSubscriberInterface
 	/**
 	 * We need the availability of the user's isocode
 	 * for the event "users_online_string_flags", the next event's rowset
+	 *
+	 * @event core.obtain_users_online_string_sql
 	 */
 	public function ipcf_obtain_users_online_string_sql_add($event)
 	{
@@ -244,6 +252,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Now we can play with it, the users's isocode saves our day
+	 *
+	 * @event core.obtain_users_online_string_modify
 	 */
 	public function users_online_string_flags($event)
 	{
@@ -253,9 +263,11 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$rowset = $event['rowset'];
+
 			$online_userlist = $event['online_userlist'];
 
 			$username = $username_ipcf = array();
+
 			foreach ($rowset as $row)
 			{
 				$user_isocode = $row['user_isocode'];

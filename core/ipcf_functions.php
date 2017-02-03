@@ -102,7 +102,7 @@ class ipcf_functions
 	/**
 	 * Obtain Country isocode from cURL
 	 *
-	 * @return string country_flag
+	 * @return string country iso code
 	 */
 	public function obtain_country_isocode_curl($user_session_ip)
 	{
@@ -119,7 +119,9 @@ class ipcf_functions
 			curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curl_handle, CURLOPT_URL, 'freegeoip.net/json/' . $user_session_ip);
 
-			/* @return mixed The IP data array, or false if error */
+			/**
+			 * @return mixed The IP data array, or false if error
+			 */
 			$ip_query = curl_exec($curl_handle);
 
 			$http_code	= curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
@@ -127,7 +129,7 @@ class ipcf_functions
 
 			if ($ip_query)
 			{
-				/* Creating an array from string*/
+				/* Creating an array from string */
 				$ip_array = @json_decode($ip_query, true);
 
 				if ( ($ip_array['country_code'] != '') && ($http_code == 200) )
@@ -138,7 +140,7 @@ class ipcf_functions
 				{
 					/**
 					 * error 403 forbidden (too many requests) or any other thing
-					 * WO represents my flag of World, aka Unknown IP
+					 * WO means World, aka Unknown IP
 					*/
 					$failure			=	ipcf_constants::FLAG_WORLD;
 					$iso_country_code	=	strtolower($failure);
@@ -148,7 +150,7 @@ class ipcf_functions
 			{
 				/**
 				 * http_code = 0, doing the dirty job here
-				 * WO represents my flag of World, aka Unknown IP
+				 * WO means World, aka Unknown IP
 				*/
 				$failure			=	ipcf_constants::FLAG_WORLD;
 				$iso_country_code	=	strtolower($failure);
@@ -156,6 +158,7 @@ class ipcf_functions
 		}
 		/**
 		 * No cURL? That shouldn't happens but..
+		 * WO means World, aka Unknown IP
 		*/
 		else
 		{
@@ -166,7 +169,6 @@ class ipcf_functions
 		return ($iso_country_code);
 	}
 
-
 	/**
 	 * Obtain Country isocode from cURL
 	 *
@@ -174,15 +176,21 @@ class ipcf_functions
 	 */
 	public function obtain_user_isocode($user_isocode = 0)
 	{
-		$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, session_ip
+		/**
+		 * Let's configure the TTL for caching
+		 */
+		//$config_time_cache = ((int) $this->config['session_length']);
+
+		$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, s.session_ip
 			FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
 			WHERE u.user_id > ' . ANONYMOUS . '
 				AND s.session_time >= ' . (time() - $this->config['session_length']) . '
-				AND u.user_id = s.session_user_id';
+				AND u.user_id = s.session_user_id
+			GROUP BY u.user_id
+			ORDER BY s.session_time DESC, u.user_id, s.session_ip';
 		$result = $this->db->sql_query($sql);
-
 		/**
-		 * Let's push/update the user_isocode
+		 * Let's push/update the users' isocode
 		 */
 		while ($row = $this->db->sql_fetchrow($result))
 		{
@@ -197,6 +205,8 @@ class ipcf_functions
 				WHERE user_id > ' . ANONYMOUS . '
 					AND user_id = ' . (int) $s_user_id . '';
 			$this->db->sql_query($sql);
+
+			//$this->db->sql_query($sql, $config_time_cache);
 		}
 		$this->db->sql_freeresult($result);
 
