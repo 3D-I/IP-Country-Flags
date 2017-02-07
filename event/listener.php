@@ -110,6 +110,7 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('u_allow_ipcf'))
 		{
 			$user_data = $event['user_data'];
+
 			/**
 			 * This part assigns/updates the user's isocode on login/registration
 			 *
