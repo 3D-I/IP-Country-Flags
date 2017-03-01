@@ -44,18 +44,18 @@ class listener implements EventSubscriberInterface
 	protected $ipcf_functions;
 
 	/**
-		* Constructor
-		*
-		* @param \phpbb\auth\auth					$auth				Authentication object
-		* @param \phpbb\cache\service				$cache		(NOT yet in use             )
-		* @param \phpbb\config\config				$config				Config Object
-		* @param \phpbb\db\driver\driver			$db					Database object
-		* @param \phpbb\user						$user				User Object
-		* @param \phpbb\request\request				$request			Request object
-		* @param \phpbb\template\template			$template			Template object
-		* @param \threedi\ipcf\core\ipcf_functions	$ipcf_functions		Methods to be used by Class
-		* @access public
-	*/
+	 * Constructor
+	 *
+	 * @param \phpbb\auth\auth					$auth				Authentication object
+	 * @param \phpbb\cache\service				$cache		(NOT yet in use             )
+	 * @param \phpbb\config\config				$config				Config Object
+	 * @param \phpbb\db\driver\driver			$db					Database object
+	 * @param \phpbb\user						$user				User Object
+	 * @param \phpbb\request\request				$request			Request object
+	 * @param \phpbb\template\template			$template			Template object
+	 * @param \threedi\ipcf\core\ipcf_functions	$ipcf_functions		Methods to be used by Class
+	 * @access public
+	 */
 	public function __construct(
 		\phpbb\auth\auth $auth,
 		\phpbb\cache\service $cache,
