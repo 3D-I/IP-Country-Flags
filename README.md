@@ -9,6 +9,11 @@ Use of cURL is mandatory.
 This ext uses the GeoLocation API: http://freegeoip.net (support IPv4 and IPv6)
 See also https://en.wikipedia.org/wiki/ISO_3166-2 for the Country Codes values
 
+# DONATIONS
+Your contribution motivates us to improve this free software and create new ones.
+[![paypal](https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZLN6KTV2WQSRN)
+
+# SCREENSHOTS
 Online list on index screenshot
 
 ![Screenshot](grabs/v0003-onlinelist.png)
