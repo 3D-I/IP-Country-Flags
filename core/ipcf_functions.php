@@ -179,8 +179,6 @@ class ipcf_functions
 		/**
 		 * Let's configure the TTL for caching
 		 */
-		//$config_time_cache = ((int) $this->config['session_length']);
-
 		$sql = 'SELECT u.user_id, s.session_user_id, s.session_time, s.session_ip
 			FROM ' . USERS_TABLE . ' u, ' . SESSIONS_TABLE . ' s
 			WHERE u.user_id > ' . ANONYMOUS . '
