@@ -203,8 +203,6 @@ class ipcf_functions
 				WHERE user_id > ' . ANONYMOUS . '
 					AND user_id = ' . (int) $s_user_id . '';
 			$this->db->sql_query($sql);
-
-			//$this->db->sql_query($sql, $config_time_cache);
 		}
 		$this->db->sql_freeresult($result);
 
